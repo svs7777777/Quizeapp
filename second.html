@@ -1,0 +1,617 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quiz Application</title>
+        <style>
+            /* Basic Styles */
+            body {
+                font-family: 'Arial', sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                /* background: linear-gradient(135deg, #ff7e5f, #feb47b); */
+                background-image: url("images.jpeg");
+                color: #fff;
+                overflow: hidden;
+            }
+
+            .container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                flex-wrap: wrap;
+                padding: 20px;
+            }
+
+            /* Cart Container */
+            .cart-container {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            /* Cart Styles */
+            .cart {
+                background-color: rgba(255, 255, 255, 0.9);
+                border-radius: 15px;
+                padding: 25px;
+                width: 250px;
+                text-align: center;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .cart:hover {
+                transform: scale(1.05);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .cart h3 {
+                font-size: 1.5em;
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            .cart p {
+                font-size: 1.1em;
+                margin-bottom: 25px;
+                color: #555;
+                line-height: 1.5;
+            }
+
+            .cart button {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 25px;
+                font-size: 1.1em;
+                cursor: pointer;
+                border-radius: 25px;
+                border: none;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .cart button:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px);
+            }
+
+            .cart button:active {
+                transform: translateY(2px);
+            }
+
+            /* Quiz Container */
+            #quizContainer {
+                display: none;
+                border: 3px solid #4CAF50;
+                border-radius: 15px;
+                width: 80%;
+                max-width: 600px;
+                text-align: center;
+                margin-top: 50px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #fff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                color: black;
+            }
+            .timer p {
+            display: flex;
+            font-size: medium;
+            margin-bottom: 10px;
+            color: red;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for contrast */
+        }
+
+        /* Score and Attempt Display */
+        .score, .atempt {
+            font-size: medium;
+            display: flex;
+        }
+
+            /* Styling the question text */
+            #question {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: #333;
+            }
+
+            /* Styling the options */
+            #options {
+                margin-bottom: 20px;
+            }
+
+            /* Styling for each option */
+            .option {
+                background-color: #f4f4f4;
+                border: 2px solid #ddd;
+                border-radius: 10px;
+                padding: 10px;
+                margin: 5px 0;
+                font-size: 18px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            /* Highlight selected option */
+            .option.selected {
+                background-color: #007bff;
+                color: white;
+            }
+
+            /* Hover effect for options */
+            .option:hover {
+                background-color: #e7f5e3;
+                transform: scale(1.05);
+            }
+
+            /* End Quiz Screen */
+            #endQuiz {
+                display: none;
+                border: 3px solid #4CAF50;
+                border-radius: 15px;
+                width: 80%;
+                max-width: 600px;
+                text-align: center;
+                background-color: #fff;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                margin-top: 50px;
+                padding: 30px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            /* Styling for the end quiz message */
+            #endQuiz h2 {
+                font-size: 28px;
+                color: #4CAF50;
+                margin-bottom: 20px;
+            }
+
+            #endQuiz p {
+                font-size: 20px;
+                margin-bottom: 30px;
+                color: blue;
+            }
+
+            #endQuiz button {
+                background-color: #4CAF50;
+                color: white;
+                font-size: 18px;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            /* Hover effect for the restart button */
+            #endQuiz button:hover {
+                background-color: #45a049;
+                transform: scale(1.05);
+            }
+
+            /* Difficulty Selection Styles */
+            .difficulty-container {
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
+                text-align: center;
+            }
+
+            .difficulty-button {
+                padding: 15px 30px;
+                font-size: 1.2em;
+                cursor: pointer;
+                border-radius: 25px;
+                border: none;
+                margin: 10px;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .difficulty-button.easy {
+                background-color: #28a745;
+            }
+
+            .difficulty-button.medium {
+                background-color: #c0c0c0;
+            }
+
+            .difficulty-button.hard {
+                background-color: #dc3545;
+            }
+
+            .difficulty-button:hover {
+                opacity: 0.8;
+                transform: translateY(-2px);
+            }
+
+            .difficulty-button:active {
+                transform: translateY(2px);
+            }
+
+            /* Highlight Selected Button */
+            .difficulty-button.selected {
+                box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+                transform: scale(1.05);
+            }
+            .rue{
+                color: black;
+                font-size: medium;
+            }
+
+            /* Navigation Buttons */
+            #previousButton, #nextButton, #submitButton {
+                background-color: #6c757d;
+                color: black;
+                padding: 12px 25px;
+                font-size: 1.1em;
+                cursor: pointer;
+                border-radius: 25px;
+                border: none;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                margin-top: 20px;
+                display: none;
+            }
+
+            #nextButton {
+                background-color: #4CAF50;
+            }
+
+            #submitButton {
+                background-color: #dc3545;
+            }
+
+            #previousButton:hover, #nextButton:hover, #submitButton:hover {
+                background-color: #5a6268;
+                transform: translateY(-2px);
+            }
+
+            #previousButton:active, #nextButton:active, #submitButton:active {
+                transform: translateY(2px);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .cart-container {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .cart {
+                    width: 80%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="cart-container" id="quizTypes">
+                <!-- Cart for Quiz Type 1 -->
+                <div class="cart">
+                    <h3>General Knowledge Quiz</h3>
+                    <p>Test your knowledge in a variety of topics.</p>
+                    <button onclick="selectQuiz('General Knowledge')">Select Quiz</button>
+                </div>
+
+                <!-- Cart for Quiz Type 2 -->
+                <div class="cart">
+                    <h3>Cricket Quiz</h3>
+                    <p>Challenge your Cricket 🏏 skills with fun problems.</p>
+                    <button onclick="selectQuiz('Cricket Quiz')">Select Quiz</button>
+                </div>
+
+                <!-- Cart for Quiz Type 3 -->
+                <div class="cart">
+                    <h3>Anime Quiz</h3>
+                    <p>Explore the world 🌍 of Anime and test your knowledge.</p>
+                    <button onclick="selectQuiz('Anime')">Select Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Difficulty Selection (hidden initially) -->
+        <div class="difficulty-container" id="difficultySelection">
+            <h1>Select Difficulty Leval </h1>
+            <button class="difficulty-button easy" onclick="selectDifficulty('Easy', this)"><h1>Easy</h1><p style="color:black;">(Beginer level with simple challenges)</p></button>
+            <button class="difficulty-button medium" onclick="selectDifficulty('Medium', this)"><h1>Medium</h1><p style="color: black;">(Inter mediate level with moderate challenges)</p></button>
+            <button class="difficulty-button hard" onclick="selectDifficulty('Hard', this)"><h1>Hard</h1><p style="color: black;">(Advanced level with tough challenges.)</p></button>
+        </div>
+
+
+
+        <!-- Quiz Container (hidden initially) -->
+        <div id="quizContainer">
+            <div class="timer">
+                <p id="timer">Time: 30:00</p>
+            </div>
+    
+            <h2 id="question">Question will appear here</h2>
+            <div id="options"></div>
+            <!-- Navigation Buttons -->
+            <button id="previousButton" onclick="previousQuestion()">Previous</button>
+            <button id="nextButton" onclick="nextQuestion()">Next</button><br><br><br>
+            <!-- Submit Button -->
+            <button id="submitButton" onclick="submitQuiz()">Submit</button>
+          
+                                <!--Rule:--->
+                                <div class="rule" style="text-align: left;">
+                                    <p>1.You have 5 minutes⏳ for giving this quize.</p>
+                                    <p>2.Your time is alredy started.</p>
+                                    <p>3.You can filled all mcq</p>
+                                    <p>4.Your Final score are show after you submite the quize.</p>
+                                    <p>5.After submite the quize page ,You will be automatically redirect in home page </p>
+                                </div>
+        </div>
+
+        <!-- End Quiz Screen (hidden initially) -->
+        <div id="endQuiz">
+            <h2>Quiz Finished!</h2>
+            <p>Your final score: <span id="finalScore"></span></p>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+
+        <script>
+            // Sample quiz data (questions, options, correct answers)
+            const quizzes = {
+                'General Knowledge': {
+                    Easy: [
+                        { question: "What is the capital of France?", options: ['Paris', 'London', 'Berlin'], correct: 'Paris' },
+                        { question: "What is the largest ocean on Earth?", options: ['Pacific Ocean', 'Atlantic Ocean', 'Indian Ocean'], correct: 'Pacific Ocean' },
+                        { question: "Which country is known as the Land of the Rising Sun?", options: ['China', 'Japan', 'South Korea'], correct: 'Japan' },
+                        { question: "What is the tallest mountain in the world?", options: ['Mount Everest', 'Mount Kilimanjaro', 'Mount Fuji'], correct: 'Mount Everest' },
+                        { question: "Which planet is known as the Red Planet?", options: ['Mars', 'Venus', 'Saturn'], correct: 'Mars' },
+                        { question: "Who painted the Mona Lisa?", options: ['Vincent van Gogh', 'Pablo Picasso', 'Leonardo da Vinci'], correct: 'Leonardo da Vinci' },
+                        { question: "Which continent is known as the 'Dark Continent'?", options: ['Asia', 'Africa', 'Australia'], correct: 'Africa' },
+                        { question: "What is the longest river in the world?", options: ['Amazon River', 'Nile River', 'Yangtze River'], correct: 'Nile River' },
+                        { question: "Which element has the chemical symbol 'O'?", options: ['Oxygen', 'Gold', 'Osmium'], correct: 'Oxygen' },
+                        { question: "What is the currency of Japan?", options: ['Yuan', 'Yen', 'Won'], correct: 'Yen' }
+                    ],
+                    Medium: [
+                        { question: "What is the capital of Canada?", options: ['Vancouver', 'Toronto', 'Ottawa'], correct: 'Ottawa' },
+                        { question: "Which famous scientist developed the laws of motion?", options: ['Albert Einstein', 'Isaac Newton', 'Galileo Galilei'], correct: 'Isaac Newton' },
+                        { question: "Which is the smallest continent by land area?", options: ['Australia', 'Africa', 'Europe'], correct: 'Australia' },
+                        { question: "Who wrote the novel '1984'?", options: ['Aldous Huxley', 'George Orwell', 'Ray Bradbury'], correct: 'George Orwell' },
+                        { question: "In what year did World War II end?", options: ['1940', '1945', '1950'], correct: '1945' },
+                        { question: "What is the longest river in Europe?", options: ['Volga', 'Danube', 'Rhine'], correct: 'Volga' },
+                        { question: "What is the largest desert in the world?", options: ['Sahara', 'Arabian Desert', 'Antarctic Desert'], correct: 'Antarctic Desert' },
+                        { question: "Which country is known for the ancient pyramids?", options: ['Greece', 'Egypt', 'Rome'], correct: 'Egypt' },
+                        { question: "What is the most widely spoken language in the world?", options: ['English', 'Mandarin', 'Spanish'], correct: 'Mandarin' },
+                        { question: "What is the tallest waterfall in the world?", options: ['Angel Falls', 'Niagara Falls', 'Iguazu Falls'], correct: 'Angel Falls' }
+                    ],
+                    Hard: [
+                        { question: "What is the capital of Mongolia?", options: ['Ulaanbaatar', 'Almaty', 'Tashkent'], correct: 'Ulaanbaatar' },
+                        { question: "Which element has the atomic number 79?", options: ['Gold', 'Silver', 'Copper'], correct: 'Gold' },
+                        { question: "Who was the first emperor of China?", options: ['Qin Shi Huang', 'Wudi', 'Xian'], correct: 'Qin Shi Huang' },
+                        { question: "What is the smallest bone in the human body?", options: ['Stapes', 'Incus', 'Malleus'], correct: 'Stapes' },
+                        { question: "In which year did the Titanic sink?", options: ['1912', '1915', '1908'], correct: '1912' },
+                        { question: "Which scientist is known for his work on the laws of electromagnetism?", options: ['Isaac Newton', 'Michael Faraday', 'Nikola Tesla'], correct: 'Michael Faraday' },
+                        { question: "Which is the longest river in Asia?", options: ['Yangtze', 'Mekong', 'Ganges'], correct: 'Yangtze' },
+                        { question: "What is the name of the first artificial satellite launched into space?", options: ['Sputnik 1', 'Apollo 11', 'Hubble'], correct: 'Sputnik 1' },
+                        { question: "What is the only metal that is liquid at room temperature?", options: ['Mercury', 'Lead', 'Aluminum'], correct: 'Mercury' },
+                        { question: "Which country is the origin of the sport of judo?", options: ['China', 'Japan', 'Korea'], correct: 'Japan' }
+                    ]
+                },
+                'Cricket Quiz': {
+                    Easy: [
+                        { question: "Which country won the 2019 Cricket World Cup?", options: ['India', 'England', 'Australia'], correct: 'England' },
+                        { question: "Who is the highest run-scorer in ODI cricket?", options: ['Sachin Tendulkar', 'Virat Kohli', 'Brian Lara'], correct: 'Sachin Tendulkar' },
+                        { question: "Which bowler has taken the most wickets in Test cricket?", options: ['Shane Warne', 'Muttiah Muralitharan', 'Glenn McGrath'], correct: 'Muttiah Muralitharan' },
+                        { question: "What is the maximum number of overs a team can bowl in an ODI match?", options: ['50', '20', '40'], correct: '50' },
+                        { question: "Who is known as the 'Master Blaster' in cricket?", options: ['Shane Warne', 'Virat Kohli', 'Sachin Tendulkar'], correct: 'Sachin Tendulkar' },
+                        { question: "In cricket, what is a duck?", options: ['A score of 1', 'A score of 0', 'A score of 5'], correct: 'A score of 0' },
+                        { question: "Which country hosted the 2016 T20 World Cup?", options: ['India', 'England', 'Australia'], correct: 'India' },
+                        { question: "Which cricketer has the most T20I runs?", options: ['Chris Gayle', 'Virat Kohli', 'AB de Villiers'], correct: 'Virat Kohli' },
+                        { question: "In which country was the first-ever Cricket World Cup held?", options: ['India', 'England', 'Australia'], correct: 'England' },
+                        { question: "Who is known as the 'Yorker King' in cricket?", options: ['Brett Lee', 'Lasith Malinga', 'James Anderson'], correct: 'Lasith Malinga' }
+                    ],
+                    Medium: [
+                        { question: "Who won the ICC Player of the Year award in 2017?", options: ['Virat Kohli', 'Steve Smith', 'Kane Williamson'], correct: 'Virat Kohli' },
+                        { question: "Which player scored the fastest 50 in IPL history?", options: ['Yuvraj Singh', 'Chris Gayle', 'AB de Villiers'], correct: 'Yuvraj Singh' },
+                        { question: "Who was the first player to take 400 wickets in Test cricket?", options: ['Shane Warne', 'Muttiah Muralitharan', 'Glenn McGrath'], correct: 'Muttiah Muralitharan' },
+                        { question: "Which cricketer is known for the famous shot 'Dil-Scoop'?", options: ['MS Dhoni', 'Shahid Afridi', 'AB de Villiers'], correct: 'AB de Villiers' },
+                        { question: "Which cricketer is known as the 'Rawalpindi Express'?", options: ['Shahid Afridi', 'Shoaib Akhtar', 'Wasim Akram'], correct: 'Shoaib Akhtar' },
+                        { question: "Who holds the record for the most runs in a single World Cup?", options: ['Sachin Tendulkar', 'Ricky Ponting', 'Virat Kohli'], correct: 'Sachin Tendulkar' },
+                        { question: "Who is the first cricketer to score a double century in a T20I?", options: ['Chris Gayle', 'Martin Guptill', 'David Warner'], correct: 'Chris Gayle' },
+                        { question: "Which bowler has taken the most wickets in T20 cricket?", options: ['Lasith Malinga', 'Shane Warne', 'Rashid Khan'], correct: 'Lasith Malinga' },
+                        { question: "Who is the fastest player to reach 1000 runs in ODI cricket?", options: ['Virat Kohli', 'AB de Villiers', 'Shikhar Dhawan'], correct: 'AB de Villiers' },
+                        { question: "Which cricketer hit six sixes in an over in a T20 match?", options: ['Yuvraj Singh', 'Shahid Afridi', 'Herschelle Gibbs'], correct: 'Yuvraj Singh' }
+                    ],
+                    Hard: [
+                        { question: "Which cricketer holds the record for most wickets in a single calendar year in ODIs?", options: ['Muttiah Muralitharan', 'Shane Warne', 'Wasim Akram'], correct: 'Muttiah Muralitharan' },
+                        { question: "Which team won the first-ever ICC Champions Trophy in 1998?", options: ['South Africa', 'India', 'Sri Lanka'], correct: 'South Africa' },
+                        { question: "Who was the first cricketer to score 200 runs in an ODI?", options: ['Saeed Anwar', 'Sachin Tendulkar', 'Virender Sehwag'], correct: 'Saeed Anwar' },
+                        { question: "Who was the first cricketer to score a triple century in Test cricket?", options: ['Don Bradman', 'Nathan Astle', 'Chris Gayle'], correct: 'Nathan Astle' },
+                        { question: "Which bowler holds the record for the most five-wicket hauls in Test cricket?", options: ['Shane Warne', 'Muttiah Muralitharan', 'Glenn McGrath'], correct: 'Muttiah Muralitharan' },
+                        { question: "Which cricketer scored the fastest century in Test cricket?", options: ['Brendon McCullum', 'David Warner', 'Chris Gayle'], correct: 'Brendon McCullum' },
+                        { question: "Which cricketer has taken the most wickets in a World Cup?", options: ['Muttiah Muralitharan', 'Shane Warne', 'Glenn McGrath'], correct: 'Muttiah Muralitharan' },
+                        { question: "Who was the first cricketer to achieve the 500 wickets milestone in ODIs?", options: ['Wasim Akram', 'Muttiah Muralitharan', 'Shane Warne'], correct: 'Wasim Akram' },
+                        { question: "Who scored the fastest 150 in ODI cricket?", options: ['Shahid Afridi', 'AB de Villiers', 'Virat Kohli'], correct: 'Shahid Afridi' },
+                        { question: "Which cricketer is known for his famous batting stance called 'The Helicopter Shot'?", options: ['MS Dhoni', 'Shahid Afridi', 'Kevin Pietersen'], correct: 'MS Dhoni' }
+                    ]
+                },
+                'Anime': {
+                    Easy: [
+                        { question: "Who is the main character of Naruto?", options: ['Naruto Uzumaki', 'Sasuke Uchiha', 'Sakura Haruno'], correct: 'Naruto Uzumaki' },
+                        { question: "What is the name of the main robot in the anime 'Neon Genesis Evangelion'?", options: ['Evangelion', 'Gundam', 'Mach 5'], correct: 'Evangelion' },
+                        { question: "Who is Goku's main rival in Dragon Ball Z?", options: ['Vegeta', 'Frieza', 'Piccolo'], correct: 'Vegeta' },
+                        { question: "Which anime features a school where students can become heroes?", options: ['My Hero Academia', 'One Punch Man', 'Attack on Titan'], correct: 'My Hero Academia' },
+                        { question: "What is the name of Naruto's village?", options: ['Konoha', 'Kiri', 'Suna'], correct: 'Konoha' },
+                        { question: "Which anime features a world where people can manipulate the elements?", options: ['Avatar: The Last Airbender', 'Dragon Ball', 'Naruto'], correct: 'Avatar: The Last Airbender' },
+                        { question: "What is the name of the main character in 'One Piece'?", options: ['Luffy', 'Naruto', 'Goku'], correct: 'Luffy' },
+                        { question: "Who is the creator of the anime 'Death Note'?", options: ['Takeshi Obata', 'Masashi Kishimoto', 'Yoshihiro Togashi'], correct: 'Takeshi Obata' },
+                        { question: "What is the name of the protagonist in 'Attack on Titan'?", options: ['Eren Yeager', 'Levi Ackerman', 'Armin Arlert'], correct: 'Eren Yeager' },
+                        { question: "What type of animal is the character 'Pikachu'?", options: ['Mouse', 'Cat', 'Dog'], correct: 'Mouse' }
+                    ],
+                    Medium: [
+                        { question: "Who is the leader of the Akatsuki in Naruto?", options: ['Pain', 'Madara', 'Obito'], correct: 'Pain' },
+                        { question: "What is the name of the main weapon used by the characters in 'Bleach'?", options: ['Zanpakuto', 'Sword', 'Saber'], correct: 'Zanpakuto' },
+                        { question: "In 'Fullmetal Alchemist', what is the name of the technique that allows alchemists to create objects?", options: ['Alchemy', 'Transmutation', 'Healing'], correct: 'Transmutation' },
+                        { question: "Who is the main antagonist in 'Dragon Ball Z'?", options: ['Frieza', 'Cell', 'Majin Buu'], correct: 'Frieza' },
+                        { question: "What anime features a character named Light Yagami?", options: ['Death Note', 'Naruto', 'One Piece'], correct: 'Death Note' },
+                        { question: "What is the name of the giant robot in 'Neon Genesis Evangelion'?", options: ['Evangelion', 'Gundam', 'Voltron'], correct: 'Evangelion' },
+                        { question: "What is the color of the Sailor Moon's hair?", options: ['Pink', 'Blonde', 'Red'], correct: 'Blonde' },
+                        { question: "In 'Attack on Titan', what is Eren's ability?", options: ['Titan Shifting', 'Healing', 'Fighting Skills'], correct: 'Titan Shifting' },
+                        { question: "What anime series features the characters Naruto, Sasuke, and Sakura?", options: ['Naruto', 'One Piece', 'Bleach'], correct: 'Naruto' },
+                        { question: "What is the name of the ship in 'One Piece'?", options: ['Thousand Sunny', 'Going Merry', 'Bounty Hunter'], correct: 'Going Merry' }
+                    ],
+                    Hard: [
+                        { question: "Who is the strongest character in 'Dragon Ball Z'?", options: ['Goku', 'Vegeta', 'Beerus'], correct: 'Goku' },
+                        { question: "What anime features the concept of 'Hunter Exams'?", options: ['Hunter x Hunter', 'Naruto', 'Bleach'], correct: 'Hunter x Hunter' },
+                        { question: "Who is the original creator of 'Naruto'?", options: ['Masashi Kishimoto', 'Eiichiro Oda', 'Hiro Mashima'], correct: 'Masashi Kishimoto' },
+                        { question: "In 'One Piece', who is the swordsman of the Straw Hat Pirates?", options: ['Zoro', 'Sanji', 'Nami'], correct: 'Zoro' },
+                        { question: "What is the name of the disease in 'Attack on Titan' that turns people into Titans?", options: ['Titan Virus', 'Titan Curse', 'The Infection'], correct: 'Titan Virus' },
+                        { question: "What is the famous technique used by the character Sasuke in 'Naruto'?", options: ['Rasengan', 'Chidori', 'Sharingan'], correct: 'Chidori' },
+                        { question: "What anime character is known for saying 'I am gonna be king of the pirates'?", options: ['Naruto', 'Luffy', 'Goku'], correct: 'Luffy' },
+                        { question: "What is the name of the academy in 'My Hero Academia'?", options: ['U.A. High School', 'Hogwarts', 'Ninjutsu Academy'], correct: 'U.A. High School' },
+                        { question: "What is the name of the giant talking bear in 'One Piece'?", options: ['Teddy', 'Kuma', 'Panda'], correct: 'Kuma' },
+                        { question: "Which anime features a character named Kirito?", options: ['Sword Art Online', 'Fairy Tail', 'Bleach'], correct: 'Sword Art Online' }
+                    ]
+                }
+            };
+
+            // Global variables
+            let selectedQuiz = '';
+            let selectedDifficulty = '';
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let timerInterval;
+            let timeLeft = 5*60;
+            
+
+            // Function to handle quiz type selection
+            function selectQuiz(quizType) {
+                selectedQuiz = quizType;
+                document.getElementById('quizTypes').style.display = 'none';
+                document.getElementById('difficultySelection').style.display = 'block';
+                document.getElementById('difficultySelection').style.opacity = '1';
+            }
+
+            // Function to handle difficulty selection and highlight selected button
+            function selectDifficulty(difficulty, buttonElement) {
+                const buttons = document.querySelectorAll('.difficulty-button');
+                buttons.forEach(button => button.classList.remove('selected'));
+                buttonElement.classList.add('selected');
+                selectedDifficulty = difficulty;
+                document.getElementById('difficultySelection').style.display = 'none';
+                document.getElementById('quizContainer').style.display = 'block';
+                startTimer();
+                loadQuestion();
+            }
+
+            // Function to start the countdown timer
+            function startTimer() {
+                timerInterval = setInterval(function() {
+                    timeLeft--;
+                    document.getElementById('timer').textContent = 'Time left: ' + formatTime(timeLeft);
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        endQuiz();
+                    }
+                }, 1000);
+            }
+
+            // Function to format time
+            function formatTime(seconds) {
+                let minutes = Math.floor(seconds / 60);
+                let secondsLeft = seconds % 60;
+                return `${minutes < 10 ? '0' : ''}${minutes}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
+            }
+
+            // Function to load a question based on selected quiz and difficulty
+            function loadQuestion() {
+                const questionData = quizzes[selectedQuiz][selectedDifficulty][currentQuestionIndex];
+                document.getElementById('question').textContent = questionData.question;
+                const optionsContainer = document.getElementById('options');
+                optionsContainer.innerHTML = ''; // Clear previous options
+
+                questionData.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('option');
+                    button.onclick = function() {
+                        // Remove selected class from all options
+                        const optionButtons = document.querySelectorAll('#options button');
+                        optionButtons.forEach(btn => btn.classList.remove('selected'));
+                        // Add selected class to the clicked option
+                        button.classList.add('selected');
+                        checkAnswer(option, questionData.correct,);
+                    };
+                    optionsContainer.appendChild(button);
+
+                    function checkAnswer(selectedOption, correctOption) {
+                                if (selectedOption === correctOption) {
+                                score++;
+                            }
+                        }
+                });
+
+                // Show/hide Previous, Next, and Submit buttons
+                document.getElementById('previousButton').style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+                document.getElementById('nextButton').style.display = currentQuestionIndex < quizzes[selectedQuiz][selectedDifficulty].length - 1 ? 'block' : 'none';
+                document.getElementById('submitButton').style.display = currentQuestionIndex === quizzes[selectedQuiz][selectedDifficulty].length - 1 ? 'block' : 'none';
+            }
+
+            // Function to move to the previous question
+            function previousQuestion() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            }
+
+            // Function to move to the next question
+            function nextQuestion() {
+                if (currentQuestionIndex < quizzes[selectedQuiz][selectedDifficulty].length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }
+            }
+
+            // Function to submit the quiz
+            function submitQuiz() {
+                endQuiz();
+            }
+
+            // Function to end the quiz
+            function endQuiz() {
+                clearInterval(timerInterval); // Stop the timer
+                document.getElementById('quizContainer').style.display = 'none';
+                document.getElementById('endQuiz').style.display = 'block';
+                document.getElementById('finalScore').textContent = score;
+
+                // Redirect to home after 3 seconds
+                setTimeout(() => {
+                    restartQuiz();
+                }, 15000);
+            }
+
+            // Function to restart the quiz
+            function restartQuiz() {
+                score = 0;
+                currentQuestionIndex = 0;
+                timeLeft = 60;
+                document.getElementById('endQuiz').style.display = 'none';
+                document.getElementById('quizTypes').style.display = 'block';
+            }
+        </script>
+    </body>
+    </html> 
